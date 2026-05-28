@@ -1,1 +1,1 @@
-# VLM-as-Teacjer.github.io
+# VLM-as-Teacher

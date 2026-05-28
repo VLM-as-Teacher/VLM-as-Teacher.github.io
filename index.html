@@ -1,1064 +1,243 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="VLMs are Good Teachers for Video Reasoning via Adaptive Test-Time Optimization — project page." />
-  <title>VLMs are Good Teachers for Video Reasoning</title>
+<!doctype html><html lang='en'><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VLMs are Good Teachers for Video Reasoning via Adaptive Test-Time Optimization</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2044%2044%22%3E%3Crect%20x%3D%222%22%20y%3D%222%22%20width%3D%2240%22%20height%3D%2240%22%20rx%3D%2213%22%20fill%3D%22%23fff5f7%22%20stroke%3D%22%23ff385c%22%20stroke-width%3D%222.2%22/%3E%3Cpath%20d%3D%22M10.5%2027.5C15%2024%2016.5%2017.2%2021.5%2017.2c3.5%200%204.7%205%207.5%205%22%20fill%3D%22none%22%20stroke%3D%22%23ff385c%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-dasharray%3D%222.4%203.3%22/%3E%3Crect%20x%3D%229%22%20y%3D%2226%22%20width%3D%225.5%22%20height%3D%225.5%22%20rx%3D%221.7%22%20fill%3D%22%23ff385c%22%20opacity%3D%22.5%22/%3E%3Crect%20x%3D%2218.5%22%20y%3D%2214.3%22%20width%3D%225.5%22%20height%3D%225.5%22%20rx%3D%221.7%22%20fill%3D%22%23ff385c%22%20opacity%3D%22.78%22/%3E%3Cpath%20d%3D%22M27.5%2025.2l3.2%203.1%205.5-7.5%22%20fill%3D%22none%22%20stroke%3D%22%23ff385c%22%20stroke-width%3D%222.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3Cpath%20d%3D%22M29.2%2012.3l2.2-2.8m2.8%205.1%203.2-1.2%22%20fill%3D%22none%22%20stroke%3D%22%23ff385c%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22/%3E%3C/svg%3E">
+  <meta name="description" content="VLMs are Good Teachers for Video Reasoning via Adaptive Test-Time Optimization">
   <style>
-    :root {
-      --palette-bg: #ffffff;
-      --palette-text-primary: #222222;
-      --palette-text-secondary: #6a6a6a;
-      --palette-text-soft: #8c8c8c;
-      --palette-bg-primary-core: #ff385c;
-      --palette-bg-primary-hover: #e00b41;
-      --palette-surface: #ffffff;
-      --palette-surface-soft: #f7f7f7;
-      --palette-border: #ebebeb;
-      --palette-divider: #dddddd;
-      --palette-card-shadow: rgba(0,0,0,0.02) 0 0 0 1px, rgba(0,0,0,0.04) 0 2px 6px, rgba(0,0,0,0.10) 0 4px 8px;
-      --palette-hover-shadow: rgba(0,0,0,0.08) 0 4px 18px;
-      --radius-sm: 8px;
-      --radius-badge: 14px;
-      --radius-card: 20px;
-      --radius-large: 32px;
-      --max-width: 1240px;
-      --font: "Airbnb Cereal VF", "Circular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    }
-
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      margin: 0;
-      color: var(--palette-text-primary);
-      background: var(--palette-bg);
-      font-family: var(--font);
-      -webkit-font-smoothing: antialiased;
-      text-rendering: geometricPrecision;
-    }
-    a { color: inherit; text-decoration: none; }
-    button { font: inherit; cursor: pointer; }
-    img, video { max-width: 100%; display: block; }
-
-    .container {
-      max-width: var(--max-width);
-      margin: 0 auto;
-      padding: 0 32px;
-    }
-
-    .header {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      background: rgba(255,255,255,0.94);
-      backdrop-filter: blur(18px);
-      border-bottom: 1px solid var(--palette-border);
-    }
-    .header-inner {
-      min-height: 78px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 22px;
-    }
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 19px;
-      font-weight: 700;
-      letter-spacing: -0.38px;
-      white-space: nowrap;
-    }
-    .brand-mark {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      display: inline-grid;
-      place-items: center;
-      color: white;
-      background: var(--palette-bg-primary-core);
-      font-size: 17px;
-      font-weight: 700;
-    }
-    .nav {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px;
-      border-radius: 999px;
-      box-shadow: var(--palette-card-shadow);
-      background: #fff;
-    }
-    .nav a {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--palette-text-secondary);
-      padding: 10px 13px;
-      border-radius: 999px;
-      transition: background .18s ease, color .18s ease;
-    }
-    .nav a:hover { background: var(--palette-surface-soft); color: var(--palette-text-primary); }
-    .header-actions { display: flex; align-items: center; gap: 10px; }
-    .button {
-      border: 1px solid var(--palette-border);
-      background: #fff;
-      color: var(--palette-text-primary);
-      min-height: 46px;
-      padding: 0 18px;
-      border-radius: 999px;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      transition: transform .15s ease, box-shadow .18s ease, border-color .18s ease;
-    }
-    .button:hover { box-shadow: var(--palette-hover-shadow); transform: translateY(-1px); }
-    .button.primary {
-      background: var(--palette-bg-primary-core);
-      border-color: var(--palette-bg-primary-core);
-      color: #fff;
-    }
-    .button.primary:hover { background: var(--palette-bg-primary-hover); border-color: var(--palette-bg-primary-hover); }
-
-    .hero {
-      padding: 66px 0 38px;
-    }
-    .hero-layout {
-      display: grid;
-      grid-template-columns: minmax(420px, 1.02fr) minmax(390px, .98fr);
-      gap: 42px;
-      align-items: center;
-    }
-    .eyebrow {
-      color: var(--palette-bg-primary-core);
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: .11em;
-      text-transform: uppercase;
-      margin: 0 0 18px;
-    }
-    h1 {
-      font-size: clamp(44px, 4.6vw, 60px);
-      line-height: 1.04;
-      letter-spacing: -1.65px;
-      margin: 0 0 22px;
-      font-weight: 700;
-    }
-    .hero-subtitle {
-      max-width: 592px;
-      font-size: 18px;
-      line-height: 1.62;
-      color: var(--palette-text-secondary);
-      margin: 0 0 28px;
-    }
-    .authors {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 9px;
-      margin-bottom: 28px;
-      color: var(--palette-text-secondary);
-      font-size: 14px;
-    }
-    .authors .placeholder {
-      border: 1px dashed var(--palette-divider);
-      background: var(--palette-surface-soft);
-      border-radius: 999px;
-      padding: 7px 12px;
-    }
-    .hero-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 11px;
-    }
-    .hero-media {
-      border-radius: var(--radius-large);
-      background: var(--palette-surface-soft);
-      padding: 12px;
-      box-shadow: var(--palette-card-shadow);
-      position: relative;
-    }
-    .media-window {
-      aspect-ratio: 16 / 10;
-      border-radius: 23px;
-      overflow: hidden;
-      background:
-        radial-gradient(circle at 18% 20%, rgba(255,56,92,.14), transparent 31%),
-        linear-gradient(140deg, #f6f6f6, #ececec);
-      position: relative;
-    }
-    .media-window video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      background: #f6f6f6;
-    }
-    .hero-placeholder, .missing-video {
-      position: absolute;
-      inset: 0;
-      display: grid;
-      place-content: center;
-      text-align: center;
-      padding: 20px;
-      color: var(--palette-text-secondary);
-      gap: 9px;
-      pointer-events: none;
-    }
-    .play-icon {
-      width: 58px;
-      height: 58px;
-      margin: 0 auto;
-      border-radius: 50%;
-      display: grid;
-      place-content: center;
-      background: #fff;
-      color: var(--palette-bg-primary-core);
-      box-shadow: var(--palette-card-shadow);
-      font-size: 22px;
-      padding-left: 3px;
-    }
-    .hero-placeholder strong { font-size: 15px; font-weight: 600; color: var(--palette-text-primary); }
-    .hero-placeholder code { font-size: 12px; color: var(--palette-text-secondary); }
-    .hero-chip {
-      position: absolute;
-      left: 28px;
-      bottom: 27px;
-      z-index: 2;
-      border-radius: 999px;
-      background: #fff;
-      box-shadow: var(--palette-card-shadow);
-      padding: 9px 14px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-
-    .metric-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin: 54px 0 0;
-    }
-    .metric-card {
-      padding: 23px 22px 21px;
-      border-radius: var(--radius-card);
-      box-shadow: var(--palette-card-shadow);
-      background: #fff;
-    }
-    .metric-value {
-      font-size: 34px;
-      line-height: 1.04;
-      letter-spacing: -0.6px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-    .metric-value.accent { color: var(--palette-bg-primary-core); }
-    .metric-label { color: var(--palette-text-secondary); font-size: 13px; line-height: 1.43; }
-
-    section { scroll-margin-top: 96px; }
-    .section {
-      padding: 70px 0;
-    }
-    .section-head {
-      max-width: 730px;
-      margin-bottom: 34px;
-    }
-    .section-head.center {
-      text-align: center;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    h2 {
-      margin: 0 0 12px;
-      font-size: clamp(30px, 3vw, 38px);
-      letter-spacing: -0.62px;
-      line-height: 1.17;
-      font-weight: 700;
-    }
-    .section-head p {
-      margin: 0;
-      font-size: 16px;
-      line-height: 1.62;
-      color: var(--palette-text-secondary);
-    }
-
-    .method-panel {
-      padding: 14px;
-      background: #fff;
-      border-radius: var(--radius-large);
-      box-shadow: var(--palette-card-shadow);
-      margin-bottom: 26px;
-    }
-    .method-image {
-      min-height: 290px;
-      border-radius: 23px;
-      background: var(--palette-surface-soft);
-      display: grid;
-      place-items: center;
-      overflow: hidden;
-      position: relative;
-    }
-    .method-image img {
-      width: 100%;
-      height: auto;
-    }
-    .placeholder-frame {
-      display: grid;
-      place-items: center;
-      text-align: center;
-      padding: 28px;
-      gap: 8px;
-      color: var(--palette-text-secondary);
-      min-height: 240px;
-    }
-    .placeholder-frame strong { color: var(--palette-text-primary); font-size: 16px; }
-    .placeholder-frame code {
-      background: #fff;
-      border: 1px solid var(--palette-border);
-      padding: 7px 10px;
-      border-radius: 9px;
-      font-size: 12px;
-    }
-    .steps {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 15px;
-    }
-    .step {
-      border-radius: var(--radius-card);
-      padding: 25px 22px;
-      background: #fff;
-      box-shadow: var(--palette-card-shadow);
-    }
-    .step-num {
-      width: 34px;
-      height: 34px;
-      display: grid;
-      place-items: center;
-      border-radius: 50%;
-      margin-bottom: 18px;
-      background: #fff1f4;
-      color: var(--palette-bg-primary-core);
-      font-size: 14px;
-      font-weight: 700;
-    }
-    .step h3 {
-      margin: 0 0 9px;
-      font-size: 19px;
-      font-weight: 600;
-      letter-spacing: -0.18px;
-    }
-    .step p {
-      margin: 0;
-      color: var(--palette-text-secondary);
-      line-height: 1.55;
-      font-size: 14px;
-    }
-
-    .results {
-      background: var(--palette-surface-soft);
-    }
-    .results-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-    }
-    .result-card {
-      background: #fff;
-      border-radius: var(--radius-card);
-      padding: 28px;
-      box-shadow: var(--palette-card-shadow);
-    }
-    .result-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 15px;
-      margin-bottom: 22px;
-    }
-    .result-header h3 {
-      font-size: 22px;
-      margin: 0;
-      letter-spacing: -0.4px;
-    }
-    .badge {
-      font-size: 12px;
-      font-weight: 700;
-      padding: 6px 10px;
-      border-radius: var(--radius-badge);
-      background: #fff1f4;
-      color: var(--palette-bg-primary-core);
-      white-space: nowrap;
-    }
-    .bar-list { display: grid; gap: 17px; }
-    .bar-row { display: grid; grid-template-columns: 92px 1fr 55px; align-items: center; gap: 12px; font-size: 13px; }
-    .bar-name { font-weight: 500; color: var(--palette-text-secondary); }
-    .bar-track {
-      background: #f0f0f0;
-      height: 9px;
-      border-radius: 999px;
-      overflow: hidden;
-    }
-    .bar-fill {
-      display: block;
-      height: 100%;
-      border-radius: inherit;
-      background: #bdbdbd;
-    }
-    .bar-row.ours .bar-name, .bar-row.ours .bar-val { font-weight: 700; color: var(--palette-text-primary); }
-    .bar-row.ours .bar-fill { background: var(--palette-bg-primary-core); }
-    .bar-val { text-align: right; font-variant-numeric: tabular-nums; }
-    .result-note {
-      margin: 23px 0 0;
-      color: var(--palette-text-secondary);
-      font-size: 13px;
-      line-height: 1.5;
-    }
-
-    .gallery-section {
-      padding: 72px 0 18px;
-    }
-    .tabs {
-      position: sticky;
-      top: 79px;
-      z-index: 10;
-      background: rgba(255,255,255,.94);
-      backdrop-filter: blur(12px);
-      display: flex;
-      gap: 9px;
-      padding: 13px 0 20px;
-      margin-bottom: 22px;
-    }
-    .tab {
-      border: 1px solid var(--palette-border);
-      background: #fff;
-      color: var(--palette-text-secondary);
-      padding: 12px 20px;
-      font-size: 14px;
-      font-weight: 600;
-      border-radius: 999px;
-      transition: all .18s ease;
-    }
-    .tab:hover { box-shadow: var(--palette-hover-shadow); color: var(--palette-text-primary); }
-    .tab.active {
-      background: var(--palette-text-primary);
-      border-color: var(--palette-text-primary);
-      color: #fff;
-    }
-    .demo-group[hidden] { display: none; }
-    .demo-cards { display: grid; gap: 27px; }
-    .case-card {
-      border-radius: var(--radius-large);
-      background: #fff;
-      box-shadow: var(--palette-card-shadow);
-      padding: 22px;
-    }
-    .case-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: start;
-      gap: 15px;
-      margin-bottom: 17px;
-    }
-    .case-title-wrap {
-      display: flex;
-      align-items: start;
-      gap: 12px;
-    }
-    .case-index {
-      color: var(--palette-bg-primary-core);
-      font-size: 13px;
-      font-weight: 700;
-      padding-top: 5px;
-    }
-    .case-title { font-size: 20px; font-weight: 600; letter-spacing: -0.32px; margin: 0 0 5px; }
-    .case-caption {
-      margin: 0;
-      color: var(--palette-text-secondary);
-      font-size: 13px;
-      line-height: 1.46;
-    }
-    .case-controls { display: flex; gap: 7px; flex-shrink: 0; }
-    .circle-action {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      border: 0;
-      background: var(--palette-surface-soft);
-      color: var(--palette-text-primary);
-      display: grid;
-      place-items: center;
-      transition: transform .16s ease, box-shadow .18s ease;
-    }
-    .circle-action:hover { transform: translateY(-1px); box-shadow: var(--palette-hover-shadow); }
-    .videos-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 12px;
-    }
-    .video-tile {
-      min-width: 0;
-    }
-    .video-shell {
-      aspect-ratio: 16 / 10;
-      overflow: hidden;
-      position: relative;
-      border-radius: 15px;
-      background: linear-gradient(135deg, #f2f2f2, #e8e8e8);
-      border: 1px solid var(--palette-border);
-    }
-    .video-tile.ours .video-shell {
-      box-shadow: 0 0 0 2px rgba(255,56,92,.88);
-    }
-    .video-shell video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      background: #f5f5f5;
-    }
-    .video-shell .missing-video {
-      font-size: 11px;
-      line-height: 1.42;
-      color: var(--palette-text-soft);
-      display: none;
-    }
-    .video-shell.is-missing .missing-video { display: grid; }
-    .video-shell.is-missing video { opacity: 0; }
-    .video-label {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 2px 0;
-      font-size: 13px;
-      font-weight: 600;
-    }
-    .video-label span:last-child {
-      color: var(--palette-text-secondary);
-      font-size: 11px;
-      font-weight: 500;
-    }
-    .video-tile.ours .video-label { color: var(--palette-bg-primary-core); }
-
-    .ablation {
-      background: var(--palette-surface-soft);
-      padding: 74px 0;
-      margin-top: 70px;
-    }
-    .ablation .case-card { background: #fff; }
-    .ablation-cards { display: grid; gap: 22px; }
-
-    .bibtex-card {
-      margin-top: 70px;
-      border-radius: var(--radius-large);
-      box-shadow: var(--palette-card-shadow);
-      background: #fff;
-      padding: 30px;
-      display: grid;
-      grid-template-columns: 1fr auto;
-      align-items: start;
-      gap: 24px;
-    }
-    .bibtex-card h2 { margin-bottom: 9px; font-size: 29px; }
-    pre {
-      margin: 22px 0 0;
-      overflow: auto;
-      border-radius: 14px;
-      background: var(--palette-surface-soft);
-      padding: 18px;
-      color: var(--palette-text-primary);
-      font-size: 13px;
-      line-height: 1.55;
-    }
-    .copy-feedback {
-      color: var(--palette-bg-primary-core);
-      font-size: 12px;
-      font-weight: 600;
-      opacity: 0;
-      transition: opacity .2s;
-      margin-top: 10px;
-      text-align: center;
-    }
-    .copy-feedback.visible { opacity: 1; }
-
-    footer {
-      margin-top: 80px;
-      border-top: 1px solid var(--palette-border);
-      padding: 30px 0 48px;
-      font-size: 13px;
-      color: var(--palette-text-secondary);
-    }
-    .footer-inner {
-      display: flex;
-      justify-content: space-between;
-      gap: 15px;
-      flex-wrap: wrap;
-    }
-    .path-note {
-      margin-top: 22px;
-      border: 1px dashed var(--palette-divider);
-      padding: 17px 20px;
-      border-radius: var(--radius-badge);
-      background: #fff;
-      font-size: 13px;
-      color: var(--palette-text-secondary);
-      line-height: 1.6;
-    }
-    .path-note code {
-      color: var(--palette-text-primary);
-      background: var(--palette-surface-soft);
-      padding: 2px 6px;
-      border-radius: 5px;
-    }
-
-    @media (max-width: 1060px) {
-      .nav { display: none; }
-      .hero-layout { grid-template-columns: 1fr; }
-      .hero-media { max-width: 720px; width: 100%; }
-      .metric-row { grid-template-columns: repeat(2, 1fr); }
-      .results-grid, .steps { grid-template-columns: 1fr; }
-      .videos-grid { overflow-x: auto; grid-template-columns: repeat(4, minmax(210px, 1fr)); padding-bottom: 7px; }
-    }
-    @media (max-width: 680px) {
-      .container { padding: 0 18px; }
-      .header-inner { min-height: 68px; }
-      .header-actions .button:not(.primary) { display: none; }
-      .hero { padding-top: 44px; }
-      h1 { letter-spacing: -1px; }
-      .metric-row { grid-template-columns: 1fr; }
-      .section, .ablation { padding: 54px 0; }
-      .tabs { top: 68px; overflow-x: auto; }
-      .case-card { padding: 16px; border-radius: var(--radius-card); }
-      .case-header { flex-direction: column; }
-      .bibtex-card { grid-template-columns: 1fr; }
-    }
-  </style>
-</head>
-<body>
-  <!--
-    Media replacement guide:
-    Hero:         assets/hero/teaser.mp4
-    Method image: assets/method/method_overview.png
-    VBVR:         assets/vbvr/case-01/{kling,baseline,videotpo,ours}.mp4 ... case-07
-    RULER:        assets/ruler/case-01/{kling,baseline,videotpo,ours}.mp4 ... case-07
-    Ablations:    assets/ablation/case-01/{baseline,wo-final,wo-process,ours}.mp4 ... case-02
-  -->
-  <header class="header">
-    <div class="container header-inner">
-      <a class="brand" href="#top" aria-label="VLM-as-Teacher home">
-        <span class="brand-mark">V</span>
-        <span>VLM-as-Teacher</span>
-      </a>
-      <nav class="nav" aria-label="Primary navigation">
-        <a href="#method">Method</a>
-        <a href="#results">Results</a>
-        <a href="#demos">Videos</a>
-        <a href="#ablations">Ablation</a>
-        <a href="#bibtex">BibTeX</a>
-      </nav>
-      <div class="header-actions">
-        <a class="button" href="#" data-placeholder-link>Paper</a>
-        <a class="button primary" href="#" data-placeholder-link>Code</a>
-      </div>
+  :root{--accent:#ff385c;--accent-dark:#e00b41;--ink:#222;--muted:#6a6a6a;--line:#ebebeb;--soft:#f7f7f7;--white:#fff;--shadow:rgba(0,0,0,.02) 0 0 0 1px,rgba(0,0,0,.04) 0 2px 6px,rgba(0,0,0,.1) 0 4px 8px;--max:1230px}
+  *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:"Circular",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:#fff}a{text-decoration:none;color:inherit}.shell{max-width:var(--max);margin:auto;padding:0 30px}
+  .top{position:sticky;top:0;z-index:30;height:76px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.92);backdrop-filter:blur(16px)}.top .shell{height:100%;display:flex;align-items:center;justify-content:space-between}.brand{font-size:20px;font-weight:700;color:var(--accent);display:flex;align-items:center;gap:10px}.brand-logo{width:38px;height:38px;overflow:visible;flex:0 0 auto}
+  .brand-logo .logo-frame{fill:#fff5f7;stroke:var(--accent);stroke-width:2.2}
+  .brand-logo .logo-track{fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-dasharray:2.4 3.3;opacity:.78}
+  .brand-logo .logo-state{fill:var(--accent)}
+  .brand-logo .s1{opacity:.48}
+  .brand-logo .s2{opacity:.76}
+  .brand-logo .logo-check{fill:none;stroke:var(--accent);stroke-width:2.7;stroke-linecap:round;stroke-linejoin:round}
+  .brand-logo .logo-signal{fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;opacity:.78}
+  .brand:hover .logo-track{animation:tracePath 1.15s linear infinite}
+  .brand:hover .logo-check{animation:checkPulse .85s ease-in-out infinite}
+  @keyframes tracePath{to{stroke-dashoffset:-11.4}}
+  @keyframes checkPulse{50%{transform:scale(1.06);transform-origin:31px 24px}}.nav{display:flex;gap:27px;font-size:14px;font-weight:600}.nav a:hover{color:var(--accent)}
+  .hero{padding:52px 0 64px}.hero-grid{display:flex;flex-direction:column;align-items:center;text-align:center;gap:42px}.hero-copy{max-width:1180px;width:100%;margin:0 auto}.hero .lead{max-width:940px;margin-left:auto;margin-right:auto}
+  h1{max-width:1160px;margin:0 auto 22px;font-size:52px;letter-spacing:-1.78px;line-height:1.08}.lead{margin:0 0 22px;color:var(--muted);font-size:17px;line-height:1.63}.authors{display:flex;justify-content:center;flex-wrap:wrap;gap:10px 25px;font-weight:600;font-size:18px;margin:27px 0 12px}.authors a:hover{color:var(--accent)}sup{font-size:10px}.affiliations{display:flex;justify-content:center;gap:26px;flex-wrap:wrap;color:var(--muted);font-size:14px;margin-bottom:30px}.actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}.btn{height:47px;border-radius:11px;padding:0 23px;display:inline-flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;transition:.2s}.btn.primary{color:white;background:var(--accent)}.btn.primary:hover{background:var(--accent-dark);transform:translateY(-2px)}.btn.secondary{border:1px solid #222}.btn.secondary:hover{background:#f6f6f6}.btn.disabled{background:#ededed;color:#9b9b9b;cursor:not-allowed}
+  .hero-media{position:relative;width:min(1180px,100%);padding:0 0 36px}.photo{width:100%;overflow:visible;background:transparent;border-radius:0;box-shadow:none;animation:float 6s ease-in-out infinite}.photo img{display:block;width:100%;height:auto;object-fit:contain;background:transparent}.photo .image-fallback{min-height:330px;border-radius:28px;box-shadow:var(--shadow)}.image-fallback{display:none;height:100%;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:var(--muted);background:linear-gradient(135deg,#fff2f5,#f4f4f4)}.image-fallback.visible{display:flex}.image-fallback b{font-size:30px;color:var(--accent)}.floating{position:absolute;left:32px;bottom:0;border-radius:18px;background:#fff;box-shadow:var(--shadow);padding:16px 19px;font-weight:600;font-size:13px;animation:floatSmall 5s ease-in-out infinite}
+  .hiring-card{position:relative;display:inline-flex;align-items:center;gap:17px;max-width:min(720px,100%);margin:8px auto 28px;padding:13px 17px 13px 15px;background:linear-gradient(106deg,#fff2f5 0%,#ffffff 56%,#fff6f8 100%);border:1px solid #ffd3dd;border-radius:999px;box-shadow:rgba(255,56,92,.12) 0 6px 20px,rgba(255,56,92,.08) 0 0 0 1px;overflow:hidden;animation:hiringLift 4.8s ease-in-out infinite}
+  .hiring-card:after{content:"";position:absolute;inset:-20% auto -20% -38%;width:34%;transform:skewX(-18deg);background:linear-gradient(90deg,transparent,rgba(255,56,92,.12),transparent);animation:hiringShine 4.4s ease-in-out infinite}
+  .hiring-pill{position:relative;z-index:1;display:inline-flex;align-items:center;gap:8px;flex:0 0 auto;color:var(--accent);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;padding:8px 11px;background:#fff;border-radius:999px}
+  .hiring-pill:before{content:"";height:8px;width:8px;background:var(--accent);border-radius:50%;box-shadow:0 0 0 5px rgba(255,56,92,.12);animation:hiringPulse 1.9s ease-in-out infinite}
+  .hiring-content{position:relative;z-index:1;display:flex;align-items:center;gap:13px;flex-wrap:wrap;text-align:left}
+  .hiring-card strong{display:block;font-size:14px;line-height:1.4;font-weight:650}
+  .hiring-card a{font-size:13px;color:var(--accent);font-weight:700;white-space:nowrap}
+  .hiring-card a:hover{text-decoration:underline}
+  @keyframes hiringLift{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+  @keyframes hiringPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.14);opacity:.8}}
+  @keyframes hiringShine{0%,66%{left:-38%}100%{left:118%}}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}@keyframes floatSmall{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:75px}.stat{box-shadow:var(--shadow);border-radius:22px;padding:24px}.stat strong{font-size:33px;letter-spacing:-1px;display:block}.stat span{font-size:13px;color:var(--muted)}
+  .section{padding:70px 0}.soft{background:var(--soft)}.section-title{margin-bottom:30px}.section-title h2{font-size:34px;letter-spacing:-.8px;margin:0 0 9px}.section-title p{max-width:650px;color:var(--muted);line-height:1.6;margin:0}#method .section-title{width:100%}#method .section-title p{max-width:none;width:100%;font-size:16px;line-height:1.65}
+  .method{background:white;border-radius:29px;box-shadow:var(--shadow);padding:30px}.method-image{width:100%;min-height:400px;background:#f5f5f5;border-radius:22px;overflow:hidden;margin-bottom:28px}.method-image img{width:100%;height:100%;display:block;object-fit:contain;background:#fff}.method-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.method-step{padding:20px 20px 18px;border-radius:20px;background:#fafafa;border:1px solid #f0f0f0}.step-index{display:inline-flex;height:27px;min-width:27px;border-radius:99px;align-items:center;justify-content:center;padding:0 9px;background:#fff0f3;color:var(--accent);font-size:12px;font-weight:700;margin-bottom:13px}.method-step h3{font-size:18px;letter-spacing:-.2px;margin:0 0 8px}.method-step p{font-size:14px;line-height:1.55;color:var(--muted);margin:0}.method-note{display:flex;align-items:center;gap:10px;margin-top:19px;padding:13px 16px;border-radius:15px;background:#fff4f6;color:#3d2730;font-size:13px;font-weight:500}.method-note b{color:var(--accent)}
+  .results{background:#222;color:#fff;border-radius:31px;padding:40px;display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center}.results h2{font-size:32px;letter-spacing:-.5px;margin:0 0 11px}.results p{margin:0;color:#dbdbdb;line-height:1.62}.numbers{display:grid;grid-template-columns:1fr 1fr;gap:12px}.numbers div{border-radius:18px;background:rgba(255,255,255,.1);padding:17px}.numbers strong{display:block;font-size:29px}.numbers span{color:#ddd;font-size:12px}
+  .gallery-panel{background:#fff;box-shadow:var(--shadow);border-radius:27px;margin-bottom:22px;overflow:hidden}.gallery-header{padding:25px 29px 19px;font-size:22px;font-weight:700}.carousel{padding:0 29px 30px;border-top:1px solid #f1f1f1}
+  .slider-bar{display:flex;align-items:center;justify-content:space-between;padding:17px 0 15px}.slide-progress{font-size:13px;font-weight:600;color:var(--muted)}.divider{padding:0 4px;color:#c2c2c2}.slider-controls{display:flex;gap:8px}.arrow{height:39px;width:39px;border:0;background:#f1f1f1;border-radius:50%;font-size:18px;cursor:pointer}.arrow:hover{background:#e8e8e8}
+  .slide-viewport{overflow:hidden}.slide-card{animation:enterRight .34s ease}.slide-card.slide-prev{animation-name:enterLeft}.slide-card.slide-next{animation-name:enterRight}@keyframes enterRight{from{opacity:0;transform:translateX(25px)}to{opacity:1;transform:none}}@keyframes enterLeft{from{opacity:0;transform:translateX(-25px)}to{opacity:1;transform:none}}
+  .prompt-row{display:flex;justify-content:space-between;gap:18px;align-items:start;max-width:1120px;margin:0 auto 19px}.prompt{font-size:16px;font-weight:600;line-height:1.48;margin:0;max-width:850px}.sync{border:0;white-space:nowrap;background:#f2f2f2;border-radius:999px;padding:9px 14px;font-size:12px;font-weight:600;cursor:pointer}
+  .videos{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;max-width:1120px;margin:0 auto}.video-card{margin:0}.video-window{position:relative;background:#f4f4f4;border-radius:18px;overflow:hidden;aspect-ratio:1/1}.video-window video{width:100%;height:100%;display:block;object-fit:contain;background:#f4f4f4}.video-fallback{display:none;height:100%;width:100%;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:#8b8b8b;font-size:11px}.video-fallback.visible{display:flex}.play-icon{display:grid;place-items:center;width:33px;height:33px;border-radius:50%;background:#fff;color:var(--accent)}.video-card figcaption{font-size:15px;color:var(--muted);font-weight:600;padding:11px 3px 3px;letter-spacing:-.05px}.video-card:last-child figcaption{color:var(--accent)}
+  .dots{display:flex;justify-content:center;gap:6px;margin-top:17px}.dot-btn{border:0;border-radius:99px;width:7px;height:7px;background:#ddd;cursor:pointer;padding:0}.dot-btn.active{background:var(--accent);width:23px}
+  .citation-wrap{position:relative}.citation pre{background:#f7f7f7;border-radius:23px;padding:30px 28px;overflow:auto;line-height:1.7;font-size:15px;margin:0;color:var(--ink)}.copy-citation{position:absolute;right:18px;top:18px;border:1px solid #dedede;background:#fff;color:var(--ink);border-radius:999px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;transition:background .2s,transform .2s}.copy-citation:hover{background:#fff1f4;color:var(--accent);border-color:#ffd3dc;transform:translateY(-1px)}.copy-citation.copied{background:#fff1f4;color:var(--accent);border-color:#ffd3dc}@media(max-width:560px){.citation pre{font-size:13px;padding:62px 18px 20px}.copy-citation{right:12px;top:12px}}.footer{border-top:1px solid var(--line);padding:34px 0;color:var(--muted);font-size:13px}
+  .reveal{opacity:0;transform:translateY(22px);transition:opacity .65s,transform .65s}.reveal.in-view{opacity:1;transform:none}
+  @media(max-width:940px){.results{grid-template-columns:1fr}.method-steps{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.videos{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.nav{display:none}.photo .image-fallback{min-height:240px}.floating{display:none}.hiring-card{max-width:100%;margin:8px auto 26px}}
+  @media(max-width:560px){.hiring-card{display:flex;flex-direction:column;align-items:flex-start;border-radius:20px;padding:14px;margin:8px 0 25px}.hiring-content{gap:7px}.hiring-card strong{font-size:14px}.shell{padding:0 18px}h1{font-size:35px}.authors{font-size:16px;gap:8px 16px}.hero{padding-top:48px}.photo .image-fallback{min-height:190px}.stats{grid-template-columns:1fr}.gallery-header{font-size:19px;padding:20px}.carousel{padding:0 14px 22px}.videos{gap:9px}.video-card figcaption{font-size:13px;padding-top:8px}.method{padding:18px}.method-image{min-height:230px}}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
+  </style></head><body>
+  <header class="top"><div class="shell"><a class="brand" href="#"><svg class="brand-logo" viewBox="0 0 44 44" aria-hidden="true" focusable="false">
+    <rect class="logo-frame" x="2" y="2" width="40" height="40" rx="13"/>
+    <path class="logo-track" d="M10.5 27.5 C15 24, 16.5 17.2, 21.5 17.2 C25 17.2, 26.2 22.2, 29 22.2"/>
+    <rect class="logo-state s1" x="9" y="26" width="5.5" height="5.5" rx="1.7"/>
+    <rect class="logo-state s2" x="18.5" y="14.3" width="5.5" height="5.5" rx="1.7"/>
+    <path class="logo-check" d="M27.5 25.2 L30.7 28.3 L36.2 20.8"/>
+    <path class="logo-signal" d="M29.2 12.3 L31.4 9.5 M34.2 14.6 L37.4 13.4"/>
+  </svg>VLM-as-Teacher</a><nav class="nav"><a href="#method">Method</a><a href="#results">Results</a><a href="#demos">Visual Results</a><a href="#ablation">Reward Analysis</a><a href="#citation">Citation</a></nav></div></header>
+  <main>
+  <section class="hero"><div class="shell hero-grid"><div class="hero-copy reveal"><h1>VLMs are Good Teachers for Video Reasoning via Adaptive Test-Time Optimization</h1><p class="lead">Video Generation Models can produce temporally coherent visual trajectories, yet often fail to follow task-specific rules. We introduce a VLM-as-Teacher framework that synthesizes task-specific reward queries and guides a VGM Reasoner through online test-time optimization of a lightweight LoRA module.</p>
+  <div class="authors">
+    <!-- Replace each "#" with the corresponding author homepage URL. -->
+    <a href="https://donahowe.github.io/" target="_blank" rel="noopener" title="Homepage of Junhao Cheng">Junhao Cheng<sup>1†</sup></a>
+    <a href="#" title="Homepage of Liang Hou">Liang Hou<sup>2</sup></a>
+    <a href="#" title="Homepage of Tianxiong Zhong">Tianxiong Zhong<sup>2</sup></a>
+    <a href="#" title="Homepage of Xin Tao">Xin Tao<sup>2</sup></a>
+    <a href="#" title="Homepage of Pengfei Wan">Pengfei Wan<sup>2</sup></a>
+    <a href="#" title="Homepage of Jing Liao">Jing Liao<sup>1✉</sup></a>
+  </div>
+  <div class="affiliations">
+    <span><sup>1</sup> City University of Hong Kong</span>
+    <span><sup>2</sup> Kling Team, Kuaishou Technology</span>
+  </div>
+  
+  <aside class="hiring-card">
+    <span class="hiring-pill">Open to Opportunities</span>
+    <div class="hiring-content">
+      <strong>Junhao Cheng is seeking 2027 Fall Job / PhD opportunities.</strong>
+      <a href="https://donahowe.github.io/" target="_blank" rel="noopener">Contact via homepage →</a>
     </div>
-  </header>
-
-  <main id="top">
-    <div class="container">
-      <section class="hero" aria-label="Paper overview">
-        <div class="hero-layout">
-          <div>
-            <p class="eyebrow">CVPR Project Page</p>
-            <h1>VLMs are Good Teachers for Video Reasoning</h1>
-            <p class="hero-subtitle">
-              Adaptive test-time optimization turns a Vision-Language Model from a textual solver
-              into a teacher that directly improves the visual reasoning trajectory of a Video Generation Model.
-            </p>
-            <div class="authors">
-              <span class="placeholder">Author list placeholder</span>
-              <span class="placeholder">Affiliation placeholder</span>
-            </div>
-            <div class="hero-buttons">
-              <a class="button primary" href="#" data-placeholder-link>Paper</a>
-              <a class="button" href="#" data-placeholder-link>arXiv</a>
-              <a class="button" href="#" data-placeholder-link>Code</a>
-              <a class="button" href="#demos">Video Results</a>
-            </div>
-          </div>
-          <div class="hero-media">
-            <div class="media-window" id="heroMedia">
-              <video muted loop playsinline preload="metadata" data-src="assets/hero/teaser.mp4" aria-label="Teaser video"></video>
-              <div class="hero-placeholder">
-                <div class="play-icon">▶</div>
-                <strong>Teaser video placeholder</strong>
-                <code>assets/hero/teaser.mp4</code>
-              </div>
-            </div>
-            <span class="hero-chip">Solver → Teacher</span>
-          </div>
-        </div>
-
-        <div class="metric-row" aria-label="Key results">
-          <div class="metric-card">
-            <div class="metric-value accent">+16.7</div>
-            <div class="metric-label">Average point gain across VBVR-Bench and RULER-Bench</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-value">0.781</div>
-            <div class="metric-label">VBVR-Bench overall score with online optimization</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-value">68.2</div>
-            <div class="metric-label">RULER-Bench average score using Qwen3-VL-4B Teacher</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-value">16</div>
-            <div class="metric-label">Average online optimization steps with early stopping</div>
-          </div>
-        </div>
-      </section>
-
-      <section id="method" class="section">
-        <div class="section-head center">
-          <p class="eyebrow">Method</p>
-          <h2>A VLM Teacher for visual execution</h2>
-          <p>
-            Rather than rewriting a prompt, the teacher synthesizes task-specific reward queries
-            and provides differentiable feedback to optimize a lightweight LoRA module in the VGM Reasoner.
-          </p>
-        </div>
-        <div class="method-panel">
-          <div class="method-image">
-            <img src="assets/method/method_overview.png" alt="Method overview" onerror="this.style.display='none';this.nextElementSibling.style.display='grid';" />
-            <div class="placeholder-frame" style="display:none">
-              <strong>Method overview placeholder</strong>
-              <span>Replace with your final framework figure</span>
-              <code>assets/method/method_overview.png</code>
-            </div>
-          </div>
-        </div>
-        <div class="steps">
-          <article class="step">
-            <div class="step-num">1</div>
-            <h3>Reward Query Synthesis</h3>
-            <p>A VLM Teacher extracts final-goal and process-constraint queries from each rule-based task condition.</p>
-          </article>
-          <article class="step">
-            <div class="step-num">2</div>
-            <h3>Online Optimization</h3>
-            <p>Differentiable VQA losses backpropagate through intermediate video predictions to update only LoRA parameters.</p>
-          </article>
-          <article class="step">
-            <div class="step-num">3</div>
-            <h3>Efficient Adaptation</h3>
-            <p>Step distillation, surrogate decoding, frame sampling, and early stopping make test-time optimization practical.</p>
-          </article>
-        </div>
-      </section>
-    </div>
-
-    <section id="results" class="section results">
-      <div class="container">
-        <div class="section-head">
-          <p class="eyebrow">Quantitative Results</p>
-          <h2>Consistent gains beyond prompt refinement</h2>
-          <p>
-            Our method directly optimizes visual reasoning trajectories, substantially outperforming
-            prompt-space refinement and sampling-based scaling at comparable test-time cost.
-          </p>
-        </div>
-        <div class="results-grid">
-          <article class="result-card">
-            <div class="result-header">
-              <h3>VBVR-Bench</h3>
-              <span class="badge">Symbolic</span>
-            </div>
-            <div class="bar-list">
-              <div class="bar-row"><span class="bar-name">Baseline</span><span class="bar-track"><span class="bar-fill" style="width:66.6%"></span></span><span class="bar-val">0.666</span></div>
-              <div class="bar-row"><span class="bar-name">VideoTPO</span><span class="bar-track"><span class="bar-fill" style="width:63.4%"></span></span><span class="bar-val">0.634</span></div>
-              <div class="bar-row"><span class="bar-name">Pass@5</span><span class="bar-track"><span class="bar-fill" style="width:68.3%"></span></span><span class="bar-val">0.683</span></div>
-              <div class="bar-row ours"><span class="bar-name">Ours</span><span class="bar-track"><span class="bar-fill" style="width:78.1%"></span></span><span class="bar-val">0.781</span></div>
-            </div>
-            <p class="result-note">+0.115 overall gain with consistent improvements on both ID and OOD tasks.</p>
-          </article>
-          <article class="result-card">
-            <div class="result-header">
-              <h3>RULER-Bench</h3>
-              <span class="badge">General-purpose</span>
-            </div>
-            <div class="bar-list">
-              <div class="bar-row"><span class="bar-name">Baseline</span><span class="bar-track"><span class="bar-fill" style="width:46.4%"></span></span><span class="bar-val">46.4</span></div>
-              <div class="bar-row"><span class="bar-name">PE</span><span class="bar-track"><span class="bar-fill" style="width:48.3%"></span></span><span class="bar-val">48.3</span></div>
-              <div class="bar-row"><span class="bar-name">VideoTPO</span><span class="bar-track"><span class="bar-fill" style="width:50.3%"></span></span><span class="bar-val">50.3</span></div>
-              <div class="bar-row ours"><span class="bar-name">Ours</span><span class="bar-track"><span class="bar-fill" style="width:68.2%"></span></span><span class="bar-val">68.2</span></div>
-            </div>
-            <p class="result-note">+21.8 points over the Reasoner baseline and improvements across all 30 evaluated tasks.</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="demos" class="gallery-section">
-      <div class="container">
-        <div class="section-head">
-          <p class="eyebrow">Video Gallery</p>
-          <h2>Side-by-side reasoning trajectories</h2>
-          <p>
-            Each example compares Kling 2.6, the distilled baseline, VideoTPO, and our online optimization framework.
-            Add your MP4 files using the paths defined in the page source.
-          </p>
-        </div>
-        <div class="tabs" role="tablist" aria-label="Benchmark galleries">
-          <button class="tab active" type="button" role="tab" aria-selected="true" data-target="vbvrGroup">VBVR-Bench · 7 Cases</button>
-          <button class="tab" type="button" role="tab" aria-selected="false" data-target="rulerGroup">RULER-Bench · 7 Cases</button>
-        </div>
-        <div id="vbvrGroup" class="demo-group" role="tabpanel">
-          <div class="demo-cards" data-gallery="vbvr"></div>
-        </div>
-        <div id="rulerGroup" class="demo-group" role="tabpanel" hidden>
-          <div class="demo-cards" data-gallery="ruler"></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="ablations" class="ablation">
-      <div class="container">
-        <div class="section-head">
-          <p class="eyebrow">Ablation</p>
-          <h2>Why both reward types matter</h2>
-          <p>
-            Final-goal supervision ensures task completion, while process supervision prevents invalid shortcut trajectories.
-            Each case contains four corresponding MP4 slots.
-          </p>
-        </div>
-        <div class="ablation-cards" data-gallery="ablation"></div>
-
-        <div id="bibtex" class="bibtex-card">
-          <div>
-            <p class="eyebrow">Citation</p>
-            <h2>BibTeX</h2>
-            <p class="section-head" style="margin:0;color:var(--palette-text-secondary);font-size:14px;">Please replace author and venue placeholders before publication.</p>
-            <pre id="bibtexText">@inproceedings{vlmasteacher2026,
-  title={VLMs are Good Teachers for Video Reasoning via Adaptive Test-Time Optimization},
-  author={Author List Placeholder},
-  booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
-  year={2026}
-}</pre>
-          </div>
-          <div>
-            <button class="button primary" id="copyBibtex" type="button">Copy BibTeX</button>
-            <div id="copyFeedback" class="copy-feedback">Copied</div>
-          </div>
-        </div>
-
-        <div class="path-note">
-          <strong>Media path convention.</strong>
-          Teaser: <code>assets/hero/teaser.mp4</code> · Method: <code>assets/method/method_overview.png</code> ·
-          Benchmark demos: <code>assets/vbvr/case-01/ours.mp4</code> and <code>assets/ruler/case-01/ours.mp4</code> ·
-          Ablations: <code>assets/ablation/case-01/ours.mp4</code>.
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    <div class="container footer-inner">
-      <span>VLMs are Good Teachers for Video Reasoning via Adaptive Test-Time Optimization</span>
-      <span>Project page template · Replace placeholders before deployment</span>
-    </div>
-  </footer>
-
+  </aside>
+  
+  <div class="actions">
+    <a class="btn primary" href="#" title="Replace with paper URL">Paper</a>
+    <a class="btn secondary" href="#" title="Replace with arXiv URL">arXiv</a>
+    <span class="btn disabled" aria-disabled="true">Code (Coming Soon)</span>
+  </div>
+  </div><div class="hero-media reveal"><div class="photo"><img src="assets/Teasor.svg" alt="Teaser figure" onerror="imageFallback(this)"><div class="image-fallback"><b>▧</b><span>Teaser image</span></div></div><div class="floating">VLM Teacher → Online Optimization → VGM Reasoner</div></div></div></section>
+  <div class="shell stats reveal"><div class="stat"><strong>+16.7</strong><span>Average performance gain</span></div><div class="stat"><strong>0.781</strong><span>VBVR-Bench overall</span></div><div class="stat"><strong>68.2</strong><span>RULER-Bench average</span></div><div class="stat"><strong>~16</strong><span>Optimization steps on average</span></div></div>
+  <section id="method" class="section soft"><div class="shell"><div class="section-title reveal"><h2>VLM as a Teacher</h2><p>Instead of asking a VLM to write a textual solution, we use it to supervise whether a generated visual reasoning trajectory follows task-specific rules and achieves the intended goal.</p></div><div class="method reveal"><div class="method-image"><img src="assets/Model.svg" alt="VLM-as-Teacher framework overview" onerror="imageFallback(this)"><div class="image-fallback"><b>◎</b><span>Method figure</span></div></div><div class="method-steps"><article class="method-step"><span class="step-index">01</span><h3>Process &amp; Goal Queries</h3><p>The VLM Teacher extracts task-specific rules and formulates one final-goal query together with process queries that verify valid intermediate trajectories.</p></article><article class="method-step"><span class="step-index">02</span><h3>Differentiable VQA Reward</h3><p>For each query, the Teacher evaluates whether the current video prediction satisfies the requirement. The likelihood of answering “Yes” provides differentiable supervision.</p></article><article class="method-step"><span class="step-index">03</span><h3>Online LoRA Optimization</h3><p>The VGM backbone remains frozen. At test time, VLM feedback updates only a lightweight LoRA module to improve visual execution for the specific reasoning instance.</p></article></div><div class="method-note"><b>Efficient by design.</b> A step-distilled Reasoner, lightweight surrogate decoding, and loss-based early stopping keep online optimization practical.</div></div></div></section>
+  <section id="results" class="section"><div class="shell"><div class="results reveal"><div><h2>Consistent rule-following improvements.</h2><p>Our method directly improves visual execution under task-specific constraints, yielding strong performance on both symbolic and general-purpose reasoning benchmarks.</p></div><div class="numbers"><div><strong>+0.115</strong><span>VBVR gain</span></div><div><strong>+21.8</strong><span>RULER gain</span></div><div><strong>30 / 30</strong><span>RULER tasks improved</span></div><div><strong>69 s</strong><span>VBVR cost</span></div></div></div></div></section>
+  <section id="demos" class="section soft"><div class="shell"><div class="section-title reveal"><h2>Video Results</h2><p>Qualitative comparison with state-of-the-art methods.</p></div>
+  <div class="gallery-panel reveal"><div class="gallery-header">Symbolic Results</div><div id="vbvr-carousel" class="carousel"></div></div>
+  <div class="gallery-panel reveal"><div class="gallery-header">General-Purpose Results</div><div id="ruler-carousel" class="carousel"></div></div>
+  </div></section>
+  <section id="ablation" class="section"><div class="shell"><div class="section-title reveal"><h2>Both Rewards Matter</h2><p>Final-goal supervision ensures successful completion, while process supervision prevents invalid shortcuts and entity-inconsistent trajectories.</p></div><div class="gallery-panel reveal"><div class="gallery-header">Goal and Process Supervision</div><div id="ablation-carousel" class="carousel"></div></div></div></section>
+  <section id="citation" class="section soft citation"><div class="shell reveal"><div class="section-title"><h2>Citation</h2></div><div class="citation-wrap"><button class="copy-citation" type="button" onclick="copyBibtex(this)">Copy BibTeX</button><pre id="bibtex-code">@article{cheng2026vlmteacher,
+    title   = {VLMs are Good Teachers for Video Reasoning via Adaptive Test-Time Optimization},
+    author  = {Cheng, Junhao and Hou, Liang and Zhong, Tianxiong and Tao, Xin and Wan, Pengfei and Liao, Jing},
+    journal = {arXiv preprint},
+    year    = {2026}
+  }</pre></div></div></section>
+  </main><footer class="footer"><div class="shell">© 2026 VLM-as-Teacher Project · City University of Hong Kong · Kling Team, Kuaishou Technology</div></footer>
   <script>
-    const METHODS = [
-      { key: "kling", label: "Kling 2.6", note: "Closed-source" },
-      { key: "baseline", label: "Baseline", note: "Distilled" },
-      { key: "videotpo", label: "+ VideoTPO", note: "Prompt-space" },
-      { key: "ours", label: "+ Ours", note: "Teacher", ours: true }
-    ];
-
-    const ABLATION_METHODS = [
-      { key: "baseline", label: "Baseline", note: "No opt." },
-      { key: "wo-final", label: "w/o Final", note: "Ablation" },
-      { key: "wo-process", label: "w/o Process", note: "Ablation" },
-      { key: "ours", label: "Ours", note: "Full", ours: true }
-    ];
-
-    const DEMO_DATA = {
-      vbvr: [
-        { title: "Object Moving", description: "Move each object to its dashed target while preserving identity and color." },
-        { title: "Maze Navigation", description: "Navigate the ball to the exit without crossing walls or disappearing." },
-        { title: "Geometric Rotation", description: "Rotate the designated shape according to the required direction and angle." },
-        { title: "Object Arrangement", description: "Rearrange visual elements to satisfy the target spatial configuration." },
-        { title: "Pattern Transformation", description: "Apply the specified transformation while keeping irrelevant shapes unchanged." },
-        { title: "Spatial Relation", description: "Execute a rule-constrained relocation under relational constraints." },
-        { title: "Sequential State Change", description: "Complete the ordered visual state transformation over time." }
-      ],
-      ruler: [
-        { title: "Chair Rotation", description: "Rotate the green chair by 90° while keeping surrounding objects fixed." },
-        { title: "Hand Correction", description: "Remove an anatomical anomaly and produce a realistic five-finger hand." },
-        { title: "Anomaly Removal", description: "Correct an abnormal visual element without altering unrelated content." },
-        { title: "Color Transformation", description: "Transform only the required object's color consistently through time." },
-        { title: "Count Control", description: "Maintain the specified number of entities throughout the generation." },
-        { title: "Direction Control", description: "Change orientation precisely while preserving visual identity." },
-        { title: "Position Control", description: "Move the subject to the requested position with minimal scene disturbance." }
-      ],
-      ablation: [
-        {
-          title: "Final-goal supervision · Pattern target",
-          description: "Without a final-goal query, intermediate validity does not ensure the required final target."
-        },
-        {
-          title: "Process supervision · Snail movement",
-          description: "Without a process query, the model may introduce another snail instead of moving the original one."
-        }
-      ]
+  function copyBibtex(button) {
+    const bibtex = document.getElementById("bibtex-code").innerText;
+    const done = () => {
+      const original = button.textContent;
+      button.textContent = "Copied!";
+      button.classList.add("copied");
+      setTimeout(() => {
+        button.textContent = original;
+        button.classList.remove("copied");
+      }, 1500);
     };
-
-    function padCase(index) {
-      return String(index + 1).padStart(2, "0");
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(bibtex).then(done);
+    } else {
+      const area = document.createElement("textarea");
+      area.value = bibtex;
+      area.style.position = "fixed";
+      area.style.opacity = "0";
+      document.body.appendChild(area);
+      area.select();
+      document.execCommand("copy");
+      area.remove();
+      done();
     }
-
-    function buildCaseCard(group, item, index, methods) {
-      const caseId = `${group}-case-${padCase(index)}`;
-      const article = document.createElement("article");
-      article.className = "case-card";
-      const header = document.createElement("div");
-      header.className = "case-header";
-      header.innerHTML = `
-        <div class="case-title-wrap">
-          <span class="case-index">${padCase(index)}</span>
-          <div>
-            <h3 class="case-title">${item.title}</h3>
-            <p class="case-caption">${item.description}</p>
-          </div>
+  }
+  
+  const PROMPTS = {
+    "vbvr": [
+    "Complete this pattern by filling in the missing grid cells on the right side.", 
+    "Circle the largest number.", 
+    "Move the yellow ball to the red square without entering any X cells.", 
+    "Move each colored object to the star marker with the same color.", 
+    "Move each object to the right so that it aligns exactly cover and fits within its corresponding dashed target outline."
+  ], 
+  "ruler": [
+    "Correct the anatomical anomaly in the image so that the structure appears natural and the posture realistic.", 
+    "Please predict the future motion of the two horses in the input image.", 
+    "Rotate the green armchair 90 degrees counterclockwise around its base center.", 
+    "Turn the sponge red while preserving its identity and position.", 
+    "Please fix the anomaly in the image so that the human anatomy conforms to normal proportions."
+  ], "ablation": [
+    "Find the shape whose color is unique, then outline that shape with a black contour.", 
+    "Observe which area the snail moves toward over time."
+  ]
+};
+  const METHODS = [
+    {file: "Kling", label: "Kling 2.6"},
+    {file: "Baseline", label: "Baseline"},
+    {file: "VideoTPO", label: "+ VideoTPO"},
+    {file: "Ours", label: "+ Ours"}
+  ];
+  const ABLATION = [
+    {file: "Baseline", label: "Baseline"},
+    {file: "wo-final", label: "w/o Final Goal"},
+    {file: "wo-process", label: "w/o Process"},
+    {file: "Ours", label: "+ Ours"}
+  ];
+  
+  function mediaCard(folder, caseIndex, method) {
+    const caseFolder = String(caseIndex + 1);
+    const src = `assets/${folder}/${caseFolder}/${method.file}.mp4`;
+    return `<figure class="video-card">
+      <div class="video-window">
+        <video muted loop playsinline preload="metadata" src="${src}" onerror="videoFallback(this)"></video>
+        <div class="video-fallback"><span class="play-icon">▶</span><span>Video placeholder</span></div>
+      </div>
+      <figcaption>${method.label}</figcaption>
+    </figure>`;
+  }
+  function videoFallback(video) {
+    video.style.display = "none";
+    video.parentElement.querySelector(".video-fallback").classList.add("visible");
+  }
+  function imageFallback(img) {
+    img.style.display = "none";
+    img.parentElement.querySelector(".image-fallback").classList.add("visible");
+  }
+  function initCarousel(rootId, folder, methods) {
+    const root = document.getElementById(rootId);
+    const state = { current: 0, prompts: PROMPTS[folder], methods };
+    root.innerHTML = `
+      <div class="slider-bar">
+        <div class="slide-progress"><span class="current"></span><span class="divider">/</span><span class="total"></span></div>
+        <div class="slider-controls">
+          <button class="arrow prev" aria-label="Previous example">←</button>
+          <button class="arrow next" aria-label="Next example">→</button>
         </div>
-        <div class="case-controls" aria-label="Playback controls for ${item.title}">
-          <button class="circle-action play-all" type="button" aria-label="Play all videos">▶</button>
-          <button class="circle-action pause-all" type="button" aria-label="Pause all videos">Ⅱ</button>
-        </div>`;
-      const grid = document.createElement("div");
-      grid.className = "videos-grid";
-
-      methods.forEach(method => {
-        const path = `assets/${group}/case-${padCase(index)}/${method.key}.mp4`;
-        const tile = document.createElement("div");
-        tile.className = `video-tile${method.ours ? " ours" : ""}`;
-        tile.innerHTML = `
-          <div class="video-shell">
-            <video muted loop playsinline controls preload="none" data-src="${path}" aria-label="${item.title} — ${method.label}"></video>
-            <div class="missing-video">
-              <span>MP4 placeholder</span>
-              <code>${path}</code>
-            </div>
-          </div>
-          <div class="video-label"><span>${method.label}</span><span>${method.note}</span></div>`;
-        grid.appendChild(tile);
-      });
-
-      article.appendChild(header);
-      article.appendChild(grid);
-      article.dataset.case = caseId;
-
-      header.querySelector(".play-all").addEventListener("click", () => {
-        const videos = article.querySelectorAll("video");
-        videos.forEach(v => {
-          loadVideo(v);
-          v.currentTime = 0;
-          v.play().catch(() => {});
+      </div>
+      <div class="slide-viewport"><article class="slide-card"></article></div>
+      <div class="dots" aria-label="Example navigation"></div>`;
+    const card = root.querySelector(".slide-card");
+    const current = root.querySelector(".current");
+    const total = root.querySelector(".total");
+    const dots = root.querySelector(".dots");
+    total.textContent = String(state.prompts.length).padStart(2, "0");
+    dots.innerHTML = state.prompts.map((_, i) => `<button class="dot-btn" aria-label="View example ${i+1}"></button>`).join("");
+    function render(direction = "next") {
+      card.classList.remove("slide-next", "slide-prev");
+      void card.offsetWidth;
+      card.classList.add(direction === "prev" ? "slide-prev" : "slide-next");
+      current.textContent = String(state.current + 1).padStart(2, "0");
+      card.innerHTML = `<div class="prompt-row">
+          <p class="prompt">“${state.prompts[state.current]}”</p>
+          <button class="sync" data-playing="false">Play all</button>
+        </div>
+        <div class="videos">${state.methods.map(m => mediaCard(folder, state.current, m)).join("")}</div>`;
+      card.querySelector(".sync").onclick = function() {
+        const isPlaying = this.dataset.playing === "true";
+        card.querySelectorAll("video").forEach(v => {
+          if (v.style.display !== "none") isPlaying ? v.pause() : v.play().catch(() => {});
         });
-      });
-      header.querySelector(".pause-all").addEventListener("click", () => {
-        article.querySelectorAll("video").forEach(v => v.pause());
-      });
-      return article;
+        this.dataset.playing = String(!isPlaying);
+        this.textContent = isPlaying ? "Play all" : "Pause all";
+      };
+      [...dots.children].forEach((d, i) => d.classList.toggle("active", i === state.current));
     }
-
-    function renderGallery(group, methods) {
-      const root = document.querySelector(`[data-gallery="${group}"]`);
-      DEMO_DATA[group].forEach((item, index) => root.appendChild(buildCaseCard(group, item, index, methods)));
-    }
-
-    renderGallery("vbvr", METHODS);
-    renderGallery("ruler", METHODS);
-    renderGallery("ablation", ABLATION_METHODS);
-
-    document.querySelectorAll(".tab").forEach(tab => {
-      tab.addEventListener("click", () => {
-        document.querySelectorAll(".tab").forEach(t => {
-          t.classList.remove("active");
-          t.setAttribute("aria-selected", "false");
-        });
-        document.querySelectorAll(".demo-group").forEach(g => g.hidden = true);
-        tab.classList.add("active");
-        tab.setAttribute("aria-selected", "true");
-        const target = document.getElementById(tab.dataset.target);
-        target.hidden = false;
-        observeVideos(target);
-      });
-    });
-
-    function loadVideo(video) {
-      if (!video.dataset.src || video.src) return;
-      video.src = video.dataset.src;
-      video.load();
-      video.addEventListener("loadeddata", () => {
-        const shell = video.closest(".video-shell");
-        if (shell) shell.classList.remove("is-missing");
-        const heroPlaceholder = video.parentElement.querySelector(".hero-placeholder");
-        if (heroPlaceholder) heroPlaceholder.style.display = "none";
-      }, { once: true });
-      video.addEventListener("error", () => {
-        const shell = video.closest(".video-shell");
-        if (shell) shell.classList.add("is-missing");
-      }, { once: true });
-    }
-
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          loadVideo(entry.target);
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { rootMargin: "240px 0px" });
-
-    function observeVideos(root = document) {
-      root.querySelectorAll("video[data-src]").forEach(v => observer.observe(v));
-    }
-
-    observeVideos(document);
-    const heroVideo = document.querySelector("#heroMedia video");
-    if (heroVideo) {
-      loadVideo(heroVideo);
-      heroVideo.addEventListener("loadeddata", () => heroVideo.play().catch(() => {}), { once: true });
-    }
-
-    document.querySelectorAll("[data-placeholder-link]").forEach(link => {
-      link.addEventListener("click", event => {
-        if (link.getAttribute("href") === "#") {
-          event.preventDefault();
-          window.alert("Replace this placeholder link with your paper/code URL.");
-        }
-      });
-    });
-
-    document.getElementById("copyBibtex").addEventListener("click", async () => {
-      const text = document.getElementById("bibtexText").innerText;
-      const feedback = document.getElementById("copyFeedback");
-      try {
-        await navigator.clipboard.writeText(text);
-      } catch (_) {
-        const selection = window.getSelection();
-        const range = document.createRange();
-        range.selectNodeContents(document.getElementById("bibtexText"));
-        selection.removeAllRanges();
-        selection.addRange(range);
+    root.querySelector(".prev").onclick = () => { state.current = (state.current - 1 + state.prompts.length) % state.prompts.length; render("prev"); };
+    root.querySelector(".next").onclick = () => { state.current = (state.current + 1) % state.prompts.length; render("next"); };
+    [...dots.children].forEach((dot, i) => dot.onclick = () => { const dir = i < state.current ? "prev" : "next"; state.current = i; render(dir); });
+    render();
+  }
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("in-view");
+        observer.unobserve(entry.target);
       }
-      feedback.classList.add("visible");
-      setTimeout(() => feedback.classList.remove("visible"), 1200);
     });
+  }, {threshold: .1});
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".reveal").forEach(el => observer.observe(el));
+    initCarousel("vbvr-carousel", "vbvr", METHODS);
+    initCarousel("ruler-carousel", "ruler", METHODS);
+    initCarousel("ablation-carousel", "ablation", ABLATION);
+  });
   </script>
-</body>
-</html>
+  </body></html>

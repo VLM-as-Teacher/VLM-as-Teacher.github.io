@@ -37,17 +37,18 @@
   .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:75px}.stat{box-shadow:var(--shadow);border-radius:22px;padding:24px}.stat strong{font-size:33px;letter-spacing:-1px;display:block}.stat span{font-size:13px;color:var(--muted)}
   .section{padding:70px 0}.soft{background:var(--soft)}.section-title{margin-bottom:30px}.section-title h2{font-size:34px;letter-spacing:-.8px;margin:0 0 9px}.section-title p{max-width:650px;color:var(--muted);line-height:1.6;margin:0}#method .section-title{width:100%}#method .section-title p{max-width:none;width:100%;font-size:16px;line-height:1.65}
   .method{background:white;border-radius:29px;box-shadow:var(--shadow);padding:30px}.method-image{width:100%;min-height:400px;background:#f5f5f5;border-radius:22px;overflow:hidden;margin-bottom:28px}.method-image img{width:100%;height:100%;display:block;object-fit:contain;background:#fff}.method-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.method-step{padding:20px 20px 18px;border-radius:20px;background:#fafafa;border:1px solid #f0f0f0}.step-index{display:inline-flex;height:27px;min-width:27px;border-radius:99px;align-items:center;justify-content:center;padding:0 9px;background:#fff0f3;color:var(--accent);font-size:12px;font-weight:700;margin-bottom:13px}.method-step h3{font-size:18px;letter-spacing:-.2px;margin:0 0 8px}.method-step p{font-size:14px;line-height:1.55;color:var(--muted);margin:0}.method-note{display:flex;align-items:center;gap:10px;margin-top:19px;padding:13px 16px;border-radius:15px;background:#fff4f6;color:#3d2730;font-size:13px;font-weight:500}.method-note b{color:var(--accent)}
-  .results{background:#222;color:#fff;border-radius:31px;padding:40px;display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center}.results h2{font-size:32px;letter-spacing:-.5px;margin:0 0 11px}.results p{margin:0;color:#dbdbdb;line-height:1.62}.numbers{display:grid;grid-template-columns:1fr 1fr;gap:12px}.numbers div{border-radius:18px;background:rgba(255,255,255,.1);padding:17px}.numbers strong{display:block;font-size:29px}.numbers span{color:#ddd;font-size:12px}
+  .chart-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}.chart-card{background:#fff;border-radius:28px;box-shadow:var(--shadow);padding:28px}.chart-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:22px}.chart-head h3{font-size:25px;letter-spacing:-.5px;margin:0 0 6px}.chart-head p{margin:0;color:var(--muted);font-size:14px}.chart-head strong{font-size:36px;color:var(--accent);letter-spacing:-1px}.bar-chart{height:255px;display:grid;grid-template-columns:repeat(4,1fr);gap:14px;align-items:end}.bar-item{height:100%;display:grid;grid-template-rows:1fr auto auto;gap:8px;text-align:center}.bar-wrap{height:178px;display:flex;align-items:end;justify-content:center;border-radius:16px;background:linear-gradient(180deg,#fafafa,#f3f3f3);overflow:hidden}.bar{width:100%;height:var(--h);border-radius:16px 16px 0 0;background:linear-gradient(180deg,#d9d9d9,#bfbfbf);animation:barRise .9s ease both}.bar-item.ours .bar{background:linear-gradient(180deg,#ff6b86,var(--accent))}.bar-item b{font-size:17px}.bar-item label{font-size:12px;color:var(--muted);font-weight:650;line-height:1.15}.bar-item.ours label{color:var(--accent)}@keyframes barRise{from{height:0}to{height:var(--h)}}
   .gallery-panel{background:#fff;box-shadow:var(--shadow);border-radius:27px;margin-bottom:22px;overflow:hidden}.gallery-header{padding:25px 29px 19px;font-size:22px;font-weight:700}.carousel{padding:0 29px 30px;border-top:1px solid #f1f1f1}
   .slider-bar{display:flex;align-items:center;justify-content:space-between;padding:17px 0 15px}.slide-progress{font-size:13px;font-weight:600;color:var(--muted)}.divider{padding:0 4px;color:#c2c2c2}.slider-controls{display:flex;gap:8px}.arrow{height:39px;width:39px;border:0;background:#f1f1f1;border-radius:50%;font-size:18px;cursor:pointer}.arrow:hover{background:#e8e8e8}
   .slide-viewport{overflow:hidden}.slide-card{animation:enterRight .34s ease}.slide-card.slide-prev{animation-name:enterLeft}.slide-card.slide-next{animation-name:enterRight}@keyframes enterRight{from{opacity:0;transform:translateX(25px)}to{opacity:1;transform:none}}@keyframes enterLeft{from{opacity:0;transform:translateX(-25px)}to{opacity:1;transform:none}}
   .prompt-row{display:flex;justify-content:space-between;gap:18px;align-items:start;max-width:1120px;margin:0 auto 19px}.prompt{font-size:16px;font-weight:600;line-height:1.48;margin:0;max-width:850px}.sync{border:0;white-space:nowrap;background:#f2f2f2;border-radius:999px;padding:9px 14px;font-size:12px;font-weight:600;cursor:pointer}
   .videos{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;max-width:1120px;margin:0 auto}.video-card{margin:0}.video-window{position:relative;background:#f4f4f4;border-radius:18px;overflow:hidden;aspect-ratio:1/1}.video-window video{width:100%;height:100%;display:block;object-fit:contain;background:#f4f4f4}.video-fallback{display:none;height:100%;width:100%;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:#8b8b8b;font-size:11px}.video-fallback.visible{display:flex}.play-icon{display:grid;place-items:center;width:33px;height:33px;border-radius:50%;background:#fff;color:var(--accent)}.video-card figcaption{font-size:15px;color:var(--muted);font-weight:600;padding:11px 3px 3px;letter-spacing:-.05px}.video-card:last-child figcaption{color:var(--accent)}
   .dots{display:flex;justify-content:center;gap:6px;margin-top:17px}.dot-btn{border:0;border-radius:99px;width:7px;height:7px;background:#ddd;cursor:pointer;padding:0}.dot-btn.active{background:var(--accent);width:23px}
+  .expanded-gallery{display:grid;gap:22px}.result-example{border-top:1px solid #f1f1f1;padding:24px 0 30px}.result-example:first-child{border-top:0}.result-meta{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;max-width:1120px;margin:0 auto 18px}.result-prompt{font-size:16px;font-weight:650;line-height:1.48;margin:0;max-width:880px;text-align:left}.result-sync{border:0;white-space:nowrap;background:#f2f2f2;border-radius:999px;padding:9px 14px;font-size:12px;font-weight:650;cursor:pointer}.result-sync:hover{background:#fff0f3;color:var(--accent)}
   .citation-wrap{position:relative}.citation pre{background:#f7f7f7;border-radius:23px;padding:30px 28px;overflow:auto;line-height:1.7;font-size:15px;margin:0;color:var(--ink)}.copy-citation{position:absolute;right:18px;top:18px;border:1px solid #dedede;background:#fff;color:var(--ink);border-radius:999px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;transition:background .2s,transform .2s}.copy-citation:hover{background:#fff1f4;color:var(--accent);border-color:#ffd3dc;transform:translateY(-1px)}.copy-citation.copied{background:#fff1f4;color:var(--accent);border-color:#ffd3dc}@media(max-width:560px){.citation pre{font-size:13px;padding:62px 18px 20px}.copy-citation{right:12px;top:12px}}.footer{border-top:1px solid var(--line);padding:34px 0;color:var(--muted);font-size:13px}
   .reveal{opacity:0;transform:translateY(22px);transition:opacity .65s,transform .65s}.reveal.in-view{opacity:1;transform:none}
-  @media(max-width:940px){.results{grid-template-columns:1fr}.method-steps{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.videos{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.nav{display:none}.photo .image-fallback{min-height:240px}.floating{display:none}.hiring-card{max-width:100%;margin:8px auto 26px}}
-  @media(max-width:560px){.hiring-card{display:flex;flex-direction:column;align-items:flex-start;border-radius:20px;padding:14px;margin:8px 0 25px}.hiring-content{gap:7px}.hiring-card strong{font-size:14px}.shell{padding:0 18px}h1{font-size:35px}.authors{font-size:16px;gap:8px 16px}.hero{padding-top:48px}.photo .image-fallback{min-height:190px}.stats{grid-template-columns:1fr}.gallery-header{font-size:19px;padding:20px}.carousel{padding:0 14px 22px}.videos{gap:9px}.video-card figcaption{font-size:13px;padding-top:8px}.method{padding:18px}.method-image{min-height:230px}}
+  @media(max-width:940px){.chart-grid{grid-template-columns:1fr}.method-steps{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.videos{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.nav{display:none}.photo .image-fallback{min-height:240px}.floating{display:none}.hiring-card{max-width:100%;margin:8px auto 26px}}
+  @media(max-width:560px){.bar-chart{height:235px;gap:9px}.chart-card{padding:20px}.chart-head strong{font-size:30px}.bar-item label{font-size:11px}.result-meta{flex-direction:column;gap:10px}.result-prompt{font-size:14px}.hiring-card{display:flex;flex-direction:column;align-items:flex-start;border-radius:20px;padding:14px;margin:8px 0 25px}.hiring-content{gap:7px}.hiring-card strong{font-size:14px}.shell{padding:0 18px}h1{font-size:35px}.authors{font-size:16px;gap:8px 16px}.hero{padding-top:48px}.photo .image-fallback{min-height:190px}.stats{grid-template-columns:1fr}.gallery-header{font-size:19px;padding:20px}.carousel{padding:0 14px 22px}.videos{gap:9px}.video-card figcaption{font-size:13px;padding-top:8px}.method{padding:18px}.method-image{min-height:230px}}
   @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
   </style></head><body>
   <header class="top"><div class="shell"><a class="brand" href="#"><svg class="brand-logo" viewBox="0 0 44 44" aria-hidden="true" focusable="false">
@@ -90,7 +91,26 @@
   </div><div class="hero-media reveal"><div class="photo"><img src="assets/Teasor.svg" alt="Teaser figure" onerror="imageFallback(this)"><div class="image-fallback"><b>▧</b><span>Teaser image</span></div></div><div class="floating">VLM Teacher → Online Optimization → VGM Reasoner</div></div></div></section>
   <div class="shell stats reveal"><div class="stat"><strong>+16.7</strong><span>Average performance gain</span></div><div class="stat"><strong>0.781</strong><span>VBVR-Bench overall</span></div><div class="stat"><strong>68.2</strong><span>RULER-Bench average</span></div><div class="stat"><strong>~16</strong><span>Optimization steps on average</span></div></div>
   <section id="method" class="section soft"><div class="shell"><div class="section-title reveal"><h2>VLMs as Teachers</h2><p>Instead of asking a VLM to write a textual solution, we use it to supervise whether a generated visual reasoning trajectory follows task-specific rules and achieves the intended goal.</p></div><div class="method reveal"><div class="method-image"><img src="assets/Model.svg" alt="VLM-as-Teacher framework overview" onerror="imageFallback(this)"><div class="image-fallback"><b>◎</b><span>Method figure</span></div></div><div class="method-steps"><article class="method-step"><span class="step-index">01</span><h3>Process &amp; Goal Queries</h3><p>The VLM Teacher extracts task-specific rules and formulates one final-goal query together with process queries that verify valid intermediate trajectories.</p></article><article class="method-step"><span class="step-index">02</span><h3>Differentiable VQA Reward</h3><p>For each query, the Teacher evaluates whether the current video prediction satisfies the requirement. The likelihood of answering “Yes” provides differentiable supervision.</p></article><article class="method-step"><span class="step-index">03</span><h3>Online LoRA Optimization</h3><p>The VGM backbone remains frozen. At test time, VLM feedback updates only a lightweight LoRA module to improve visual execution for the specific reasoning instance.</p></article></div><div class="method-note"><b>Efficient by design.</b> A step-distilled Reasoner, lightweight surrogate decoding, and loss-based early stopping keep online optimization practical.</div></div></div></section>
-  <section id="results" class="section"><div class="shell"><div class="results reveal"><div><h2>Consistent rule-following improvements.</h2><p>Our method directly improves visual execution under task-specific constraints, yielding strong performance on both symbolic and general-purpose reasoning benchmarks.</p></div><div class="numbers"><div><strong>+0.115</strong><span>VBVR gain</span></div><div><strong>+21.8</strong><span>RULER gain</span></div><div><strong>30 / 30</strong><span>RULER tasks improved</span></div><div><strong>69 s</strong><span>VBVR cost</span></div></div></div></div></section>
+  <section id="results" class="section"><div class="shell"><div class="section-title reveal"><h2>Quantitative Results</h2><p>The proposed online test-time optimization consistently outperforms sampling-based scaling and prompt-space refinement.</p></div><div class="chart-grid reveal">
+  <article class="chart-card">
+    <div class="chart-head"><div><h3>VBVR-Bench</h3><p>Overall score ↑</p></div><strong>0.781</strong></div>
+    <div class="bar-chart">
+      <div class="bar-item"><div class="bar-wrap"><span class="bar" style="--h:85.3%"></span></div><b>0.666</b><label>Baseline</label></div>
+      <div class="bar-item"><div class="bar-wrap"><span class="bar" style="--h:87.5%"></span></div><b>0.683</b><label>Pass@5</label></div>
+      <div class="bar-item"><div class="bar-wrap"><span class="bar" style="--h:81.2%"></span></div><b>0.634</b><label>VideoTPO</label></div>
+      <div class="bar-item ours"><div class="bar-wrap"><span class="bar" style="--h:100%"></span></div><b>0.781</b><label>Ours</label></div>
+    </div>
+  </article>
+  <article class="chart-card">
+    <div class="chart-head"><div><h3>RULER-Bench</h3><p>Average score ↑</p></div><strong>68.2</strong></div>
+    <div class="bar-chart">
+      <div class="bar-item"><div class="bar-wrap"><span class="bar" style="--h:68.0%"></span></div><b>46.4</b><label>Baseline</label></div>
+      <div class="bar-item"><div class="bar-wrap"><span class="bar" style="--h:72.0%"></span></div><b>49.1</b><label>Pass@5</label></div>
+      <div class="bar-item"><div class="bar-wrap"><span class="bar" style="--h:73.8%"></span></div><b>50.3</b><label>VideoTPO</label></div>
+      <div class="bar-item ours"><div class="bar-wrap"><span class="bar" style="--h:100%"></span></div><b>68.2</b><label>Ours</label></div>
+    </div>
+  </article>
+</div></div></section>
   <section id="demos" class="section soft"><div class="shell"><div class="section-title reveal"><h2>Video Results</h2><p>Qualitative comparison with state-of-the-art methods.</p></div>
   <div class="gallery-panel reveal"><div class="gallery-header">Symbolic Results</div><div id="vbvr-carousel" class="carousel"></div></div>
   <div class="gallery-panel reveal"><div class="gallery-header">General-Purpose Results</div><div id="ruler-carousel" class="carousel"></div></div>
@@ -161,7 +181,7 @@
     {file: "wo-process", label: "w/o Process"},
     {file: "Ours", label: "+ Ours"}
   ];
-  
+
   function mediaCard(folder, caseIndex, method) {
     const caseFolder = String(caseIndex + 1);
     const src = `assets/${folder}/${caseFolder}/${method.file}.mp4`;
@@ -225,6 +245,32 @@
     [...dots.children].forEach((dot, i) => dot.onclick = () => { const dir = i < state.current ? "prev" : "next"; state.current = i; render(dir); });
     render();
   }
+
+  function renderExpandedResults(rootId, folder, methods) {
+    const root = document.getElementById(rootId);
+    const prompts = PROMPTS[folder];
+    root.innerHTML = `<div class="expanded-gallery">${prompts.map((prompt, index) => `
+      <article class="result-example">
+        <div class="result-meta">
+          <p class="result-prompt">“${prompt}”</p>
+          <button class="result-sync" data-playing="false">Play all</button>
+        </div>
+        <div class="videos">${methods.map(m => mediaCard(folder, index, m)).join("")}</div>
+      </article>`).join("")}</div>`;
+
+    root.querySelectorAll(".result-sync").forEach(button => {
+      button.onclick = function() {
+        const example = this.closest(".result-example");
+        const isPlaying = this.dataset.playing === "true";
+        example.querySelectorAll("video").forEach(v => {
+          if (v.style.display !== "none") isPlaying ? v.pause() : v.play().catch(() => {});
+        });
+        this.dataset.playing = String(!isPlaying);
+        this.textContent = isPlaying ? "Play all" : "Pause all";
+      };
+    });
+  }
+
   const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
@@ -235,9 +281,9 @@
   }, {threshold: .1});
   document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".reveal").forEach(el => observer.observe(el));
-    initCarousel("vbvr-carousel", "vbvr", METHODS);
-    initCarousel("ruler-carousel", "ruler", METHODS);
-    initCarousel("ablation-carousel", "ablation", ABLATION);
+    renderExpandedResults("vbvr-carousel", "vbvr", METHODS);
+    renderExpandedResults("ruler-carousel", "ruler", METHODS);
+    renderExpandedResults("ablation-carousel", "ablation", ABLATION);
   });
   </script>
   </body></html>
